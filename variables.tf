@@ -35,3 +35,8 @@ variable "rds_password" {
 variable "s3_bucket_name" {
   default = "finance-tracker-uploads"
 }
+
+variable "ssh_key_name" {
+  description = "SSH key name for accessing worker nodes"
+  default     = "mytest_keypair"
+}

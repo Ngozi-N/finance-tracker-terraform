@@ -7,18 +7,18 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "public" {
-  count = length(var.public_subnets)
+# resource "aws_subnet" "public" {
+#   count = length(var.public_subnets)
 
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.public_subnets[count.index]
-  map_public_ip_on_launch = true
-  availability_zone = element(["eu-west-2a", "eu-west-2b"], count.index)
+#   vpc_id            = aws_vpc.main.id
+#   cidr_block        = var.public_subnets[count.index]
+#   map_public_ip_on_launch = true
+#   availability_zone = element(["eu-west-2a", "eu-west-2b"], count.index)
 
-  tags = {
-    Name = "finance-tracker-public-${count.index}"
-  }
-}
+#   tags = {
+#     Name = "finance-tracker-public-${count.index}"
+#   }
+# }
 
 resource "aws_subnet" "private" {
   count = length(var.private_subnets)
