@@ -3,23 +3,46 @@ pipeline {
 
     environment {
         AWS_REGION = "eu-west-2"
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key')  // Store in Jenkins credentials
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')  // Store in Jenkins credentials
-        DOCKER_HUB_USERNAME = "ngozin"
-        DOCKER_HUB_PASSWORD = credentials('docker-hub-password')  // Store in Jenkins credentials
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key')  // Stored in Jenkins credentials
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')  // Stored in Jenkins credentials
+        DOCKER_HUB_USERNAME = "your-docker-hub-username"
+        DOCKER_HUB_PASSWORD = credentials('docker-hub-password')  // Stored in Jenkins credentials
+        S3_BACKEND_REPO = "https://github.com/Ngozi-N/finance-tracker-s3-backend-setup.git"
+        TERRAFORM_REPO = "https://github.com/Ngozi-N/finance-tracker-terraform.git"
         FRONTEND_REPO = "https://github.com/Ngozi-N/finance-tracker-frontend.git"
         BACKEND_REPO = "https://github.com/Ngozi-N/finance-tracker-backend.git"
         KUBERNETES_REPO = "https://github.com/Ngozi-N/finance-tracker-kubernetes.git"
         TERRAFORM_DIR = "terraform"
+        S3_BACKEND_DIR = "s3-backend"
         KUBE_NAMESPACE = "finance-tracker"
     }
 
     stages {
+        stage('Clone S3 Backend Repository') {
+            steps {
+                script {
+                    sh "rm -rf ${S3_BACKEND_DIR}"
+                    sh "git clone ${S3_BACKEND_REPO} ${S3_BACKEND_DIR}"
+                }
+            }
+        }
+
+        stage('Deploy S3 Backend for Terraform State') {
+            steps {
+                dir("${S3_BACKEND_DIR}") {
+                    script {
+                        sh "terraform init"
+                        sh "terraform apply -auto-approve"
+                    }
+                }
+            }
+        }
+
         stage('Clone Terraform Repository') {
             steps {
                 script {
                     sh "rm -rf ${TERRAFORM_DIR}"
-                    sh "git clone https://github.com/Ngozi-N/finance-tracker-terraform.git ${TERRAFORM_DIR}"
+                    sh "git clone ${TERRAFORM_REPO} ${TERRAFORM_DIR}"
                 }
             }
         }
