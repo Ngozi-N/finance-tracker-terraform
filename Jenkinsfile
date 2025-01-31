@@ -9,9 +9,9 @@ pipeline {
         DOCKER_HUB_PASSWORD = credentials('docker-hub-password')  // Stored in Jenkins credentials
         S3_BACKEND_REPO = "https://github.com/Ngozi-N/finance-tracker-s3-backend-setup.git"
         TERRAFORM_REPO = "https://github.com/Ngozi-N/finance-tracker-terraform.git"
-        FRONTEND_REPO = "https://github.com/Ngozi-N/finance-tracker-frontend.git"
-        BACKEND_REPO = "https://github.com/Ngozi-N/finance-tracker-backend.git"
-        KUBERNETES_REPO = "https://github.com/Ngozi-N/finance-tracker-kubernetes.git"
+        FRONTEND_REPO = "git@github.com:Ngozi-N/finance-tracker-frontend.git"
+        BACKEND_REPO = "git@github.com:Ngozi-N/finance-tracker-backend.git"
+        KUBERNETES_REPO = "git@github.com:Ngozi-N/finance-tracker-kubernetes.git"
         TERRAFORM_DIR = "terraform"
         S3_BACKEND_DIR = "s3-backend"
         KUBE_NAMESPACE = "finance-tracker"
@@ -38,6 +38,20 @@ pipeline {
             }
         }
 
+        stage('Setup SSH for GitHub') {
+            steps {
+                script {
+                    sh "mkdir -p ~/.ssh"
+                    sh "chmod 700 ~/.ssh"
+                    withCredentials([sshUserPrivateKey(credentialsId: 'github-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                        sh "echo \"$SSH_KEY\" > ~/.ssh/id_rsa"
+                        sh "chmod 600 ~/.ssh/id_rsa"
+                        sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+                    }
+                }
+            }
+        }
+        
         stage('Clone Terraform Repository') {
             steps {
                 script {
