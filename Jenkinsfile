@@ -5,7 +5,7 @@ pipeline {
         AWS_REGION = "eu-west-2"
         AWS_ACCESS_KEY_ID = credentials('aws-access-key')  // Stored in Jenkins credentials
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')  // Stored in Jenkins credentials
-        DOCKER_HUB_USERNAME = "your-docker-hub-username"
+        DOCKER_HUB_USERNAME = "ngozin"
         DOCKER_HUB_PASSWORD = credentials('docker-hub-password')  // Stored in Jenkins credentials
         S3_BACKEND_REPO = "https://github.com/Ngozi-N/finance-tracker-s3-backend-setup.git"
         TERRAFORM_REPO = "https://github.com/Ngozi-N/finance-tracker-terraform.git"
