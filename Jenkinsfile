@@ -37,20 +37,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Setup SSH for GitHub') {
-            steps {
-                script {
-                    sh "mkdir -p ~/.ssh"
-                    sh "chmod 700 ~/.ssh"
-                    withCredentials([sshUserPrivateKey(credentialsId: 'github-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                        sh "echo \"$SSH_KEY\" > ~/.ssh/id_rsa"
-                        sh "chmod 600 ~/.ssh/id_rsa"
-                        sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
-                    }
-                }
-            }
-        }
         
         stage('Clone Terraform Repository') {
             steps {
@@ -84,6 +70,20 @@ pipeline {
             }
         }
 
+        stage('Setup SSH for GitHub') {
+            steps {
+                script {
+                    sh "mkdir -p ~/.ssh"
+                    sh "chmod 700 ~/.ssh"
+                    withCredentials([sshUserPrivateKey(credentialsId: 'github-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                        sh "echo \"$SSH_KEY\" > ~/.ssh/id_rsa"
+                        sh "chmod 600 ~/.ssh/id_rsa"
+                        sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+                    }
+                }
+            }
+        }
+        
         stage('Clone Application Repositories') {
             steps {
                 script {
