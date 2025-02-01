@@ -102,9 +102,13 @@ pipeline {
             steps {
                 dir('backend') {
                     script {
-                        sh "docker build -t ${DOCKER_HUB_USERNAME}/finance-tracker-backend:latest ."
-                        sh "echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin"
-                        sh "docker push ${DOCKER_HUB_USERNAME}/finance-tracker-backend:latest"
+                        withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_HUB_PASSWORD')]) {
+                            sh """
+                                echo "\$DOCKER_HUB_PASSWORD" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
+                                docker build -t ${DOCKER_HUB_USERNAME}/finance-tracker-backend:latest .
+                                docker push ${DOCKER_HUB_USERNAME}/finance-tracker-backend:latest
+                            """
+                        }
                     }
                 }
             }
@@ -114,9 +118,13 @@ pipeline {
             steps {
                 dir('frontend') {
                     script {
-                        sh "docker build -t ${DOCKER_HUB_USERNAME}/finance-tracker-frontend:latest ."
-                        sh "echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin"
-                        sh "docker push ${DOCKER_HUB_USERNAME}/finance-tracker-frontend:latest"
+                        withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_HUB_PASSWORD')]) {
+                            sh """
+                                echo "\$DOCKER_HUB_PASSWORD" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
+                                docker build -t ${DOCKER_HUB_USERNAME}/finance-tracker-frontend:latest .
+                                docker push ${DOCKER_HUB_USERNAME}/finance-tracker-frontend:latest
+                            """
+                        }
                     }
                 }
             }
