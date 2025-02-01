@@ -76,13 +76,18 @@ pipeline {
                     sh "mkdir -p ~/.ssh"
                     sh "chmod 700 ~/.ssh"
                     withCredentials([sshUserPrivateKey(credentialsId: 'github-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                        sh "echo \"$SSH_KEY\" > ~/.ssh/id_rsa"
-                        sh "chmod 600 ~/.ssh/id_rsa"
-                        sh "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+                        sh """
+                            echo "$SSH_KEY" > ~/.ssh/id_rsa
+                            chmod 600 ~/.ssh/id_rsa
+                            ssh-keyscan github.com >> ~/.ssh/known_hosts
+                            chmod 644 ~/.ssh/known_hosts
+                            export GIT_SSH_COMMAND='ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
+                        """
                     }
                 }
             }
         }
+
         
         stage('Clone Application Repositories') {
             steps {
