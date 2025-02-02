@@ -51,7 +51,7 @@ pipeline {
             steps {
                 dir("${TERRAFORM_DIR}") {
                     script {
-                        sh "rm -rf .terraform"
+                        sh "rm -rf .terraform terraform.tfstate terraform.tfstate.backup"
                         sh "terraform init -reconfigure"
                         sh "terraform apply -auto-approve"
                     }
