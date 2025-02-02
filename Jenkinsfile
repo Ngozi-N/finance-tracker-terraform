@@ -47,11 +47,24 @@ pipeline {
             }
         }
 
-        stage('Terraform Init & Apply') {
+        stage('Terraform Initialization') {
             steps {
                 dir("${TERRAFORM_DIR}") {
                     script {
-                        sh "terraform init -reconfigure"
+                        // Force reconfigure the backend and migrate existing state
+                        sh """
+                            rm -rf .terraform
+                            terraform init -reconfigure -migrate-state
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir("${TERRAFORM_DIR}") {
+                    script {
                         sh "terraform apply -auto-approve"
                     }
                 }
