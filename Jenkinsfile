@@ -129,6 +129,19 @@ pipeline {
                 }
             }
         }
+
+        stage('Authenticate kubectl with EKS') {
+            steps {
+                script {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                        sh """
+                            aws eks update-kubeconfig --region eu-west-2 --name finance-tracker-eks
+                            kubectl get nodes  # Check if kubectl is authenticated
+                        """
+                    }
+                }
+            }
+        }
         
         stage('Deploy to Kubernetes') {
             steps {
