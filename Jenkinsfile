@@ -29,7 +29,7 @@ pipeline {
                 dir("${TERRAFORM_DIR}") {
                     script {
                         sh "rm -rf .terraform terraform.tfstate terraform.tfstate.backup"
-                        sh "terraform init -reconfigure"
+                        sh "terraform init"
                         sh "terraform apply -auto-approve"
                     }
                 }
