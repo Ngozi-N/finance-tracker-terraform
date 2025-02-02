@@ -153,6 +153,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Update Secrets with Terraform Output') {
+            steps {
+                script {
+                    def databaseUrl = sh(script: "terraform output -raw rds_database_url", returnStdout: true).trim()
+                    sh """
+                        sed -i 's|{{DATABASE_URL}}|${databaseUrl}|' kubernetes/secrets.yaml
+                    """
+                }
+            }
+        }
         
         stage('Deploy to Kubernetes') {
             steps {
