@@ -7,36 +7,13 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')  // Stored in Jenkins credentials
         DOCKER_HUB_USERNAME = "ngozin"
         DOCKER_HUB_PASSWORD = credentials('docker-hub-password')  // Stored in Jenkins credentials
-        S3_BACKEND_REPO = "https://github.com/Ngozi-N/finance-tracker-s3-backend-setup.git"
         TERRAFORM_REPO = "https://github.com/Ngozi-N/finance-tracker-terraform.git"
         FRONTEND_REPO = "git@github.com:Ngozi-N/finance-tracker-frontend.git"
         BACKEND_REPO = "git@github.com:Ngozi-N/finance-tracker-backend.git"
         KUBERNETES_REPO = "git@github.com:Ngozi-N/finance-tracker-kubernetes.git"
         TERRAFORM_DIR = "terraform"
-        S3_BACKEND_DIR = "s3-backend"
         KUBE_NAMESPACE = "finance-tracker"
     }
-
-    stages {
-        stage('Clone S3 Backend Repository') {
-            steps {
-                script {
-                    sh "rm -rf ${S3_BACKEND_DIR}"
-                    sh "git clone ${S3_BACKEND_REPO} ${S3_BACKEND_DIR}"
-                }
-            }
-        }
-
-        stage('Deploy S3 Backend for Terraform State') {
-            steps {
-                dir("${S3_BACKEND_DIR}") {
-                    script {
-                        sh "terraform init -reconfigure"
-                        sh "terraform apply -auto-approve"
-                    }
-                }
-            }
-        }
         
         stage('Clone Terraform Repository') {
             steps {
