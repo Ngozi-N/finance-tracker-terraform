@@ -40,3 +40,9 @@ variable "ssh_key_name" {
   description = "SSH key name for accessing worker nodes"
   default     = "mytest_keypair"
 }
+
+variable "rds_database" {
+  description = "The name of the PostgreSQL database"
+  type        = string
+  default     = "finance_tracker"  # Change this if needed
+}
