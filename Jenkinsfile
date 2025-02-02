@@ -142,6 +142,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Create Kubernetes Namespace') {
+            steps {
+                script {
+                    sh """
+                        kubectl create namespace ${KUBE_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                        kubectl get namespace ${KUBE_NAMESPACE}  # Verify the namespace exists
+                    """
+                }
+            }
+        }
         
         stage('Deploy to Kubernetes') {
             steps {
