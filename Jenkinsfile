@@ -51,10 +51,9 @@ pipeline {
             steps {
                 dir("${TERRAFORM_DIR}") {
                     script {
-                        // Force reconfigure the backend and migrate existing state
                         sh """
                             rm -rf .terraform
-                            terraform init -reconfigure -migrate-state
+                            terraform init -reconfigure
                         """
                     }
                 }
