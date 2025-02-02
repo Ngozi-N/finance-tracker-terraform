@@ -10,6 +10,12 @@ output "rds_endpoint" {
   value = aws_db_instance.finance_tracker_db.endpoint
 }
 
+output "rds_database_url" {
+  description = "Base64-encoded database connection URL"
+  value       = base64encode("postgres://${var.rds_username}:${var.rds_password}@${aws_db_instance.finance_tracker_db.endpoint}:5432/finance_tracker_db")
+  sensitive   = true
+}
+
 output "s3_bucket_name" {
   value = aws_s3_bucket.finance_tracker_uploads.bucket  
 }
