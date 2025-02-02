@@ -31,7 +31,7 @@ pipeline {
             steps {
                 dir("${S3_BACKEND_DIR}") {
                     script {
-                        sh "terraform init"
+                        sh "terraform init -reconfigure"
                         sh "terraform apply -auto-approve"
                     }
                 }
