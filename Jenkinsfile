@@ -14,7 +14,8 @@ pipeline {
         TERRAFORM_DIR = "terraform"
         KUBE_NAMESPACE = "finance-tracker"
     }
-        
+
+    stages {
         stage('Clone Terraform Repository') {
             steps {
                 script {
@@ -64,7 +65,6 @@ pipeline {
             }
         }
 
-        
         stage('Clone Application Repositories') {
             steps {
                 script {
@@ -168,5 +168,5 @@ pipeline {
                 }
             }
         }
-    }
+    }  
 }
