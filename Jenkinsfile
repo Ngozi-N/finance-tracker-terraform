@@ -130,6 +130,18 @@ pipeline {
             }
         }
 
+        stage('Authenticate with Kubernetes') {
+            steps {
+                script {
+                    sh """
+                        mkdir -p ~/.kube
+                        cp /var/lib/jenkins/.kube/config ~/.kube/config
+                        export KUBECONFIG=~/.kube/config
+                    """
+                }
+            }
+        }
+        
         stage('Deploy to Kubernetes') {
             steps {
                 dir('kubernetes') {
