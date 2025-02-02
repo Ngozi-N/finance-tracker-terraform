@@ -8,7 +8,6 @@ resource "aws_db_subnet_group" "finance_tracker_subnet_group" {
   }
 }
 
-# Create the RDS Instance
 resource "aws_db_instance" "finance_tracker_db" {
   identifier            = "finance-tracker-db"
   engine               = "postgres"
@@ -16,12 +15,12 @@ resource "aws_db_instance" "finance_tracker_db" {
   allocated_storage    = 20
   username            = var.rds_username
   password            = var.rds_password
+  db_name             = var.rds_database  # Ensure the database name is set
   publicly_accessible  = false
   skip_final_snapshot  = true
   db_subnet_group_name = aws_db_subnet_group.finance_tracker_subnet_group.name
   vpc_security_group_ids = [aws_security_group.eks.id]
-  multi_az = true  # Ensure high availability by using at least 2 AZs
-  db_name = "finance_tracker_db"
+  multi_az = true  
 
   tags = {
     Name = "finance-tracker-db"
