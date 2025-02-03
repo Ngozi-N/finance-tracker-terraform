@@ -132,47 +132,37 @@ pipeline {
             }
         }
 
-        stage('Update Secrets with Terraform Output') {
+        stage('Update Secrets with RDS Output') {
             steps {
                 script {
-                    echo "Initializing Terraform to ensure providers are correctly set up..."
-                    sh "terraform init -upgrade"
+                    echo "Retrieving RDS endpoint from AWS..."
 
-                    echo "Refreshing Terraform state to ensure latest RDS details..."
-                    sh "terraform refresh"
-
-                    def maxRetries = 5
-                    def retryCount = 0
-                    def databaseUrl = ""
-
-                    while (retryCount < maxRetries) {
-                        databaseUrl = sh(script: "terraform output -raw rds_database_url || echo ''", returnStdout: true).trim()
-
-                        if (databaseUrl && databaseUrl.startsWith("postgresql")) {
-                            echo "Successfully retrieved RDS URL: ${databaseUrl}"
-                            break
-                        }
-
-                        echo "Attempt ${retryCount + 1}/${maxRetries}: Waiting for Terraform to output RDS URL..."
-                        sleep 10
-                        retryCount++
-                    }
+                    def databaseUrl = sh(script: """
+                        echo -n "postgresql://finance_user:securepassword123!@$(aws rds describe-db-instances --region eu-west-2 --query 'DBInstances[0].Endpoint.Address' --output text):5432/finance_tracker"
+                    """, returnStdout: true).trim()
 
                     if (!databaseUrl || !databaseUrl.startsWith("postgresql")) {
-                        error("Terraform did not output a valid RDS URL. Check Terraform state and configuration.")
+                        error("Failed to retrieve a valid RDS database URL from AWS. Check if RDS is properly deployed.")
                     } else {
+                        echo "Successfully retrieved RDS URL: ${databaseUrl}"
+
+                        // Convert database URL to Base64 format for Kubernetes secrets
                         def base64DatabaseUrl = sh(script: "echo -n '${databaseUrl}' | base64", returnStdout: true).trim()
 
+                        // Replace placeholder with actual Base64-encoded database URL
                         sh """
                             sed -i 's|{{DATABASE_URL_B64}}|${base64DatabaseUrl}|' kubernetes/secrets.yaml
                         """
 
                         echo "Updated secrets.yaml with new RDS URL."
+                        
+                        // Apply updated secrets.yaml to Kubernetes
                         sh "kubectl apply -f kubernetes/secrets.yaml"
                     }
                 }
             }
         }
+
         
         stage('Deploy to Kubernetes') {
             steps {
