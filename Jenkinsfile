@@ -137,9 +137,11 @@ pipeline {
                 script {
                     echo "Retrieving RDS endpoint from AWS..."
 
-                    def databaseUrl = sh(script: """
-                        echo -n "postgresql://finance_user:securepassword123!@$(aws rds describe-db-instances --region eu-west-2 --query 'DBInstances[0].Endpoint.Address' --output text):5432/finance_tracker"
-                    """, returnStdout: true).trim()
+                    // Use triple single quotes to prevent Groovy from misinterpreting `$()`
+                    def databaseUrl = sh(script: '''
+                        RDS_ENDPOINT=$(aws rds describe-db-instances --region eu-west-2 --query 'DBInstances[0].Endpoint.Address' --output text)
+                        echo -n "postgresql://finance_user:securepassword123!@$RDS_ENDPOINT:5432/finance_tracker"
+                    ''', returnStdout: true).trim()
 
                     if (!databaseUrl || !databaseUrl.startsWith("postgresql")) {
                         error("Failed to retrieve a valid RDS database URL from AWS. Check if RDS is properly deployed.")
@@ -150,9 +152,9 @@ pipeline {
                         def base64DatabaseUrl = sh(script: "echo -n '${databaseUrl}' | base64", returnStdout: true).trim()
 
                         // Replace placeholder with actual Base64-encoded database URL
-                        sh """
-                            sed -i 's|{{DATABASE_URL_B64}}|${base64DatabaseUrl}|' kubernetes/secrets.yaml
-                        """
+                        sh '''
+                            sed -i 's|{{DATABASE_URL_B64}}|''' + base64DatabaseUrl + '''|' kubernetes/secrets.yaml
+                        '''
 
                         echo "Updated secrets.yaml with new RDS URL."
                         
@@ -162,7 +164,6 @@ pipeline {
                 }
             }
         }
-
         
         stage('Deploy to Kubernetes') {
             steps {
