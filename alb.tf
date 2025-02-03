@@ -7,8 +7,4 @@ resource "aws_lb" "finance_tracker" {
 
   enable_deletion_protection = false
   tags = { Name = "finance-tracker-alb" }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> e0c2728 (Commit files)

@@ -73,7 +73,3 @@ resource "aws_iam_role" "application_role" {
   })
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> e0c2728 (Commit files)

@@ -25,8 +25,4 @@ output "eks_cluster_name" {
 
 output "node_group_name" {
   value = aws_eks_node_group.finance_tracker_nodes.node_group_name
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> e0c2728 (Commit files)
