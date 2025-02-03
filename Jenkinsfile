@@ -137,7 +137,6 @@ pipeline {
                 script {
                     echo "Retrieving RDS endpoint from AWS..."
 
-                    // Use triple single quotes to prevent Groovy from misinterpreting `$()`
                     def databaseUrl = sh(script: '''
                         RDS_ENDPOINT=$(aws rds describe-db-instances --region eu-west-2 --query 'DBInstances[0].Endpoint.Address' --output text)
                         echo -n "postgresql://finance_user:securepassword123!@$RDS_ENDPOINT:5432/finance_tracker"
@@ -148,10 +147,10 @@ pipeline {
                     } else {
                         echo "Successfully retrieved RDS URL: ${databaseUrl}"
 
-                        // Convert database URL to Base64 format for Kubernetes secrets
-                        def base64DatabaseUrl = sh(script: "echo -n '${databaseUrl}' | base64", returnStdout: true).trim()
+                        // Convert database URL to a single-line Base64 format
+                        def base64DatabaseUrl = sh(script: "echo -n '${databaseUrl}' | base64 -w 0", returnStdout: true).trim()
 
-                        // Replace placeholder with actual Base64-encoded database URL
+                        // Ensure sed replacement works without breaking due to newlines
                         sh '''
                             sed -i 's|{{DATABASE_URL_B64}}|''' + base64DatabaseUrl + '''|' kubernetes/secrets.yaml
                         '''
@@ -164,6 +163,7 @@ pipeline {
                 }
             }
         }
+
         
         stage('Deploy to Kubernetes') {
             steps {
