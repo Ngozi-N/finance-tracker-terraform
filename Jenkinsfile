@@ -135,6 +135,9 @@ pipeline {
         stage('Update Secrets with Terraform Output') {
             steps {
                 script {
+                    echo "Refreshing Terraform state to ensure latest RDS details..."
+                    sh "terraform refresh"  // Ensure Terraform outputs are updated
+                    
                     def maxRetries = 5
                     def retryCount = 0
                     def databaseUrl = ""
@@ -142,7 +145,7 @@ pipeline {
                     while (retryCount < maxRetries) {
                         databaseUrl = sh(script: "terraform output -raw rds_database_url || echo ''", returnStdout: true).trim()
                         
-                        if (databaseUrl && !databaseUrl.contains("ERROR") && databaseUrl.startsWith("postgresql")) {
+                        if (databaseUrl && databaseUrl.startsWith("postgresql")) {
                             echo "Successfully retrieved RDS URL: ${databaseUrl}"
                             break
                         }
@@ -152,12 +155,17 @@ pipeline {
                         retryCount++
                     }
 
-                    if (!databaseUrl || databaseUrl.contains("ERROR") || !databaseUrl.startsWith("postgresql")) {
+                    if (!databaseUrl || !databaseUrl.startsWith("postgresql")) {
                         error("Terraform did not output a valid RDS URL. Check Terraform state and configuration.")
                     } else {
+                        def base64DatabaseUrl = sh(script: "echo -n '${databaseUrl}' | base64", returnStdout: true).trim()
+                        
                         sh """
-                            sed -i 's|{{DATABASE_URL}}|${databaseUrl}|' kubernetes/secrets.yaml
+                            sed -i 's|{{DATABASE_URL_B64}}|${base64DatabaseUrl}|' kubernetes/secrets.yaml
                         """
+
+                        echo "Updated secrets.yaml with new RDS URL."
+                        sh "kubectl apply -f kubernetes/secrets.yaml"
                     }
                 }
             }
