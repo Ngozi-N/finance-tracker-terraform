@@ -11,7 +11,7 @@ output "rds_endpoint" {
 }
 
 output "rds_database_url" {
-  value = "postgresql://${var.rds_username}:${var.rds_password}@${aws_db_instance.finance_tracker_db.endpoint}:5432/${var.rds_database}"
+  value = "postgresql://${var.rds_username}:${var.rds_password}@${aws_db_instance.finance_tracker_db.address}:5432/${var.rds_database}"
   sensitive = true
 }
 

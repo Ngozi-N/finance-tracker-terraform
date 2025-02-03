@@ -22,6 +22,8 @@ resource "aws_db_instance" "finance_tracker_db" {
   vpc_security_group_ids = [aws_security_group.eks.id]
   multi_az = true  
 
+  depends_on = [aws_db_subnet_group.finance_tracker_subnet_group]  # Ensure the subnet exists before DB
+
   tags = {
     Name = "finance-tracker-db"
   }

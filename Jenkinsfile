@@ -135,10 +135,25 @@ pipeline {
         stage('Update Secrets with Terraform Output') {
             steps {
                 script {
-                    def databaseUrl = sh(script: "terraform output -raw rds_database_url || echo 'ERROR: No Database URL found'", returnStdout: true).trim()
-                    
-                    if (databaseUrl.contains("ERROR")) {
-                        error("Terraform did not output an RDS URL. Check Terraform state and configuration.")
+                    def maxRetries = 5
+                    def retryCount = 0
+                    def databaseUrl = ""
+
+                    while (retryCount < maxRetries) {
+                        databaseUrl = sh(script: "terraform output -raw rds_database_url || echo ''", returnStdout: true).trim()
+                        
+                        if (databaseUrl && !databaseUrl.contains("ERROR") && databaseUrl.startsWith("postgresql")) {
+                            echo "Successfully retrieved RDS URL: ${databaseUrl}"
+                            break
+                        }
+                        
+                        echo "Attempt ${retryCount + 1}/${maxRetries}: Waiting for Terraform to output RDS URL..."
+                        sleep 10
+                        retryCount++
+                    }
+
+                    if (!databaseUrl || databaseUrl.contains("ERROR") || !databaseUrl.startsWith("postgresql")) {
+                        error("Terraform did not output a valid RDS URL. Check Terraform state and configuration.")
                     } else {
                         sh """
                             sed -i 's|{{DATABASE_URL}}|${databaseUrl}|' kubernetes/secrets.yaml
