@@ -25,4 +25,8 @@ resource "aws_db_instance" "finance_tracker_db" {
   tags = {
     Name = "finance-tracker-db"
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e0c2728 (Commit files)

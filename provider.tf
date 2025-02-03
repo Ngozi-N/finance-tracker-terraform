@@ -1,6 +1,7 @@
 provider "aws" {
   region = var.aws_region
 }
+<<<<<<< HEAD
 
 # store the state file after your S3 bucket 
 #terraform {
@@ -12,3 +13,5 @@ provider "aws" {
 #    dynamodb_table = "finance-tracker-locks"
 #  }
 #}
+=======
+>>>>>>> e0c2728 (Commit files)

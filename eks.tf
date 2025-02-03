@@ -35,4 +35,8 @@ resource "aws_eks_node_group" "finance_tracker_nodes" {
     aws_iam_role_policy_attachment.eks_cni_policy,
     aws_iam_role_policy_attachment.ecr_read_only
   ]
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e0c2728 (Commit files)

@@ -174,4 +174,8 @@ pipeline {
             }
         }
     }  
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e0c2728 (Commit files)

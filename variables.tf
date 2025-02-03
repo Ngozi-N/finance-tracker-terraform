@@ -45,4 +45,8 @@ variable "rds_database" {
   description = "The name of the PostgreSQL database"
   type        = string
   default     = "finance_tracker"  # Change this if needed
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e0c2728 (Commit files)
